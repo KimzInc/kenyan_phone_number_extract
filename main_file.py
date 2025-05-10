@@ -27,14 +27,10 @@ hendrerit dui augue eget mauris. Nulla aliquam consequat quam, in auctor ante pu
 # \(254\) - matches (254)
 # 0254 matches 0254
 # 0: local numbers start with zero
-# \d{9,10}
+# \d{9,10} or \d{9}
 
 # alternative pattern: r'(?:\+254|0|\(254\)|0254)\d{9}'
 _phone_pattern = r'(?:\+254|0|\(254\)|0254)\d{9,10}'
-
-matches = re.findall(_phone_pattern, text)
-
-# print(matches)
 
 # clean all phone numbers 
 
@@ -42,3 +38,19 @@ def get_standard_cell_numbers(phone: str):
     phone = phone.replace("(", "").replace(")", "")
     if phone.startswith("0"):
         return "+254" + phone[1:]
+    elif phone.startswith("254"):
+        return "+254" + phone[3:]
+    elif phone.startswith("+254"):
+        return phone
+    elif phone.startswith("0254"):
+        return "+254" + phone[4:]
+    return phone
+
+clean_cell_num = [get_standard_cell_numbers(m) for m in re.findall(_phone_pattern, text)]
+
+# add to a text file 
+with open("cell_numbers.txt", "w") as file:
+    for number in clean_cell_num:
+        file.write(number + "\n")
+    
+print("Numbers save to cell_numbers.txt")
